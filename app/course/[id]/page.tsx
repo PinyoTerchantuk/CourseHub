@@ -16,16 +16,31 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
 
     useEffect(() => {
         const fetchCourse = async () => {
-            const res = await fetch("http://localhost:3005/courses");
-            const data = await res.json();
-            const found = data.find((c: Course) => String(c.id) === String(id));
+            try {
+                // 🌟 ทริค: กำหนด Base URL ให้ถูกต้อง
+                // ถ้ามี VERCEL_URL (อยู่บนเว็บจริง) ให้ใช้อันนั้น ถ้าไม่มีให้ใช้ localhost:3000
+                const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+                    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+                    : "http://localhost:3000"; // ระวัง! ต้องเป็น 3000 นะครับ ไม่ใช่ 3005 แล้ว
 
-            if (found) {
-                setCourse(found);
-                if (found.coursesDtl?.length > 0) {
-                    setCurrentVideo("https://www.w3schools.com/html/mov_bbb.mp4"); // วิดีโอจำลอง
-                    setActiveLectureId(found.coursesDtl[0].id);
+                const res = await fetch(`${baseUrl}/api/courses`);
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
                 }
+
+                const data = await res.json();
+                const found = data.find((c: Course) => String(c.id) === String(id));
+
+                if (found) {
+                    setCourse(found);
+                    if (found.coursesDtl?.length > 0) {
+                        setCurrentVideo("https://www.w3schools.com/html/mov_bbb.mp4"); // วิดีโอจำลอง
+                        setActiveLectureId(found.coursesDtl[0].id);
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch course detail:", error);
             }
         };
         fetchCourse();

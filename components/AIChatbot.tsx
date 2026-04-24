@@ -17,7 +17,7 @@ export default function AIChatbot() {
     useEffect(() => {
         const fetchAllCourses = async () => {
             try {
-                const res = await fetch("http://localhost:3005/courses");
+                const res = await fetch("/api/courses");
                 const data = await res.json();
                 setCourses(data);
             } catch (err) {
@@ -100,8 +100,8 @@ export default function AIChatbot() {
                                     className={`flex ${msg.role === "ai" ? "justify-start" : "justify-end"}`}
                                 >
                                     <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-wrap ${msg.role === "ai"
-                                            ? "bg-white/10 text-slate-200 rounded-tl-none border border-white/5"
-                                            : "bg-cyan-500 text-white rounded-tr-none shadow-lg shadow-cyan-500/20"
+                                        ? "bg-white/10 text-slate-200 rounded-tl-none border border-white/5"
+                                        : "bg-cyan-500 text-white rounded-tr-none shadow-lg shadow-cyan-500/20"
                                         }`}>
                                         {msg.text}
                                     </div>

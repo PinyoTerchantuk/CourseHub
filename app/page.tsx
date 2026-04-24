@@ -15,7 +15,7 @@ export default function HomePage() {
     useEffect(() => {
         const fetchCourses = async () => {
             try {
-                const res = await fetch("http://localhost:3005/courses");
+                const res = await fetch("/api/courses");
                 const data = await res.json();
                 setCourses(data);
                 setFilteredCourses(data);
