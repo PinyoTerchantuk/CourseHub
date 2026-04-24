@@ -17,19 +17,16 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
     useEffect(() => {
         const fetchCourse = async () => {
             try {
-                // 🌟 ทริค: กำหนด Base URL ให้ถูกต้อง
-                // ถ้ามี VERCEL_URL (อยู่บนเว็บจริง) ให้ใช้อันนั้น ถ้าไม่มีให้ใช้ localhost:3000
-                const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
-                    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-                    : "http://localhost:3000"; // ระวัง! ต้องเป็น 3000 นะครับ ไม่ใช่ 3005 แล้ว
-
-                const res = await fetch(`${baseUrl}/api/courses`);
+                // 🌟 ใช้ลิงก์แบบสั้น (Relative Path) เบราว์เซอร์จะรู้เองว่าต้องดึงจากเว็บปัจจุบัน
+                const res = await fetch("/api/courses");
 
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
 
                 const data = await res.json();
+
+                // ค้นหาคอร์สที่ id ตรงกับ URL
                 const found = data.find((c: Course) => String(c.id) === String(id));
 
                 if (found) {
@@ -38,12 +35,19 @@ export default function CourseDetailPage({ params }: { params: Promise<{ id: str
                         setCurrentVideo("https://www.w3schools.com/html/mov_bbb.mp4"); // วิดีโอจำลอง
                         setActiveLectureId(found.coursesDtl[0].id);
                     }
+                } else {
+                    console.error("ไม่พบคอร์สเรียนนี้ในฐานข้อมูล");
                 }
             } catch (error) {
+                // 🌟 ถ้า Error จะได้แสดงใน Console เบราว์เซอร์
                 console.error("Failed to fetch course detail:", error);
             }
         };
-        fetchCourse();
+
+        // ป้องกันไม่ให้มันทำงานถ้า id ยังไม่มา
+        if (id) {
+            fetchCourse();
+        }
     }, [id]);
 
     // หน้า Loading ระหว่างรอข้อมูล (จะโชว์แป๊บเดียว)
